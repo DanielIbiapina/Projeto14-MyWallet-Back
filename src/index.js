@@ -1,15 +1,14 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { MongoClient } from 'mongodb';
-import { getRegistros } from './controllers/registrosController.js';
-import { postEntrada, postSaida } from './controllers/operacaoController.js';
 import registrosRouter from './routes/registrosRouter.js';
-//import cors from 'cors'
+import operacaoRouter from './routes/operacaoRouter.js';
+import cors from 'cors'
 
 const app = express();
 dotenv.config();
 app.use(express.json());
-//app.use(cors());
+app.use(cors());
 
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
@@ -21,8 +20,10 @@ try{
 }
 
 const db = mongoClient.db("myWallet")
+export default db
 
 app.use(registrosRouter);
+app.use(operacaoRouter);
 
 
 
