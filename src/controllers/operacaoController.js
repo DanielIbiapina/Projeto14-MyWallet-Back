@@ -3,17 +3,19 @@ import joi from "joi";
 import dayjs from "dayjs"
 
 export async function postEntrada(req, res){
-        const {valor, descricao} = req.body;
+        const {valor, descricao, positivo} = req.body;
 
         const messageSchema = joi.object({
             valor: joi.number().required().min(1),
             descricao: joi.string().required().min(1),
+            positivo: joi.string(),
             time: joi.string(),
           });
 
         const message = {
           valor,
           descricao,
+          positivo,
           time: dayjs().format("HH:mm:ss"),
         };
       
