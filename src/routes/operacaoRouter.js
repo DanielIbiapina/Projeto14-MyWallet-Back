@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { postEntrada, postSaida } from '../controllers/operacaoController.js';
+import { postOperacao } from "../controllers/operacaoController.js"
+import { verificar } from '../middlewares/verificador.js';
 
 const operacaoRouter = Router();
-operacaoRouter.post("/operacao", postEntrada);
-operacaoRouter.post("/operacao", postSaida)
+operacaoRouter.post("/operacao",  postOperacao);
 
 export default operacaoRouter;

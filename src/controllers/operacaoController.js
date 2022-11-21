@@ -2,7 +2,8 @@ import db from "../index.js"
 import joi from "joi";
 import dayjs from "dayjs"
 
-export async function postEntrada(req, res){
+export async function postOperacao(req, res){
+    
         const {valor, descricao, positivo} = req.body;
 
         const messageSchema = joi.object({
@@ -36,7 +37,4 @@ export async function postEntrada(req, res){
           res.sendStatus(500);
         }
       
-}
-export async function postSaida(req, res){
-
 }

@@ -4,6 +4,7 @@ import { MongoClient } from 'mongodb';
 import registrosRouter from './routes/registrosRouter.js';
 import operacaoRouter from './routes/operacaoRouter.js';
 import cors from 'cors'
+import authRouter from './routes/authRouter.js';
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,7 @@ export default db
 
 app.use(registrosRouter);
 app.use(operacaoRouter);
+app.use(authRouter);
 
 
 
