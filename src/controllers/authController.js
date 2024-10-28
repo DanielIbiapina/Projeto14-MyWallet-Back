@@ -14,20 +14,32 @@ export async function signUp(req, res) {
 
 export async function signIn(req, res) {
   const { email, password } = req.body;
-  const token = uuid();
 
-  const user = await db.collection("users").findOne({ email });
+  try {
+    const user = await db.collection("users").findOne({ email });
 
-  if (user && bcrypt.compareSync(password, user.password)) {
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return res.sendStatus(401);
+    }
+
+    const token = uuid();
+
+    // Remover sessões antigas do usuário (opcional, mas recomendado)
+    await db.collection("sessions").deleteMany({ userId: user._id });
+
+    // Criar nova sessão
     await db.collection("sessions").insertOne({
       token,
       userId: user._id,
     });
+
     res.send({ token });
-  } else {
-    res.sendStatus(401);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
   }
 }
+
 export async function meusDados(req, res) {
   const { authorization } = req.headers;
   const token = authorization?.replace("Bearer ", "");
@@ -36,11 +48,17 @@ export async function meusDados(req, res) {
   }
 
   try {
-    const sessions = await db.collection("sessions").findOne({ token });
+    const session = await db.collection("sessions").findOne({ token });
 
-    const user = await db
-      .collection("users")
-      .findOne({ _id: sessions?.userId });
+    if (!session) {
+      return res.sendStatus(401);
+    }
+
+    const user = await db.collection("users").findOne({ _id: session.userId });
+
+    if (!user) {
+      return res.sendStatus(404);
+    }
 
     delete user.password;
     delete user.confirme;
