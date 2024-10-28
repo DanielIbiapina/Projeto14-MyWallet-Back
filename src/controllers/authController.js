@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import db from "../index.js";
+import { ObjectId } from "mongodb";
 
 export async function signUp(req, res) {
   const user = req.body;
@@ -24,10 +25,8 @@ export async function signIn(req, res) {
 
     const token = uuid();
 
-    // Remover sessões antigas do usuário (opcional, mas recomendado)
     await db.collection("sessions").deleteMany({ userId: user._id });
 
-    // Criar nova sessão
     await db.collection("sessions").insertOne({
       token,
       userId: user._id,
@@ -54,7 +53,9 @@ export async function meusDados(req, res) {
       return res.sendStatus(401);
     }
 
-    const user = await db.collection("users").findOne({ _id: session.userId });
+    const user = await db
+      .collection("users")
+      .findOne({ _id: new ObjectId(session.userId) });
 
     if (!user) {
       return res.sendStatus(404);
