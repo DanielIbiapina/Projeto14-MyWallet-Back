@@ -25,12 +25,13 @@ export async function signIn(req, res) {
 
     const token = uuid();
 
-    await db.collection("sessions").deleteMany({ userId: user._id });
-
-    await db.collection("sessions").insertOne({
+    const session = {
       token,
-      userId: user._id,
-    });
+      userId: new ObjectId(user._id),
+    };
+
+    await db.collection("sessions").deleteMany({ userId: user._id });
+    await db.collection("sessions").insertOne(session);
 
     res.send({ token });
   } catch (err) {
@@ -42,7 +43,9 @@ export async function signIn(req, res) {
 export async function meusDados(req, res) {
   const { authorization } = req.headers;
   const token = authorization?.replace("Bearer ", "");
+
   if (!token) {
+    console.log("Token não fornecido");
     return res.sendStatus(401);
   }
 
@@ -50,14 +53,16 @@ export async function meusDados(req, res) {
     const session = await db.collection("sessions").findOne({ token });
 
     if (!session) {
+      console.log("Sessão não encontrada");
       return res.sendStatus(401);
     }
 
-    const user = await db
-      .collection("users")
-      .findOne({ _id: new ObjectId(session.userId) });
+    const user = await db.collection("users").findOne({
+      _id: new ObjectId(session.userId),
+    });
 
     if (!user) {
+      console.log("Usuário não encontrado");
       return res.sendStatus(404);
     }
 
@@ -66,7 +71,7 @@ export async function meusDados(req, res) {
 
     res.send(user);
   } catch (err) {
-    console.log(err);
+    console.log("Erro:", err);
     res.sendStatus(500);
   }
 }
